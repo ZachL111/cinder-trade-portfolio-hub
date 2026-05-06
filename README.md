@@ -1,67 +1,40 @@
 # cinder-trade-portfolio-hub
 
-`cinder-trade-portfolio-hub` is a Zig project for Trading systems. It turns design a Zig verification harness for portfolio systems, covering simulation kernel, seeded input scenarios, and failure-oriented tests into a small local model with readable fixtures and a direct verification command.
+`cinder-trade-portfolio-hub` is a compact Zig repository for trading systems, centered on this goal: Design a Zig verification harness for portfolio systems, covering simulation kernel, seeded input scenarios, and failure-oriented tests.
 
-## Reading Cinder Trade Portfolio Hub
+## Problem It Tries To Make Smaller
 
-Start with the README, then open `metadata/project.json` to check the constants behind the examples. After that, `fixtures/cases.csv` shows the compact path and `examples/extended_cases.csv` gives a wider look at the same rule.
+This is intentionally local and self-contained so it can be inspected without credentials, services, or seeded history.
 
-## What It Does
+## Cinder Trade Portfolio Hub Review Notes
 
-- Includes extended examples for fills, including `recovery` and `degraded`.
-- Documents portfolio pressure tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+The first comparison I would make is `quote width` against `spread pressure` because it shows where the rule is most opinionated.
 
-## Purpose
+## Working Pieces
 
-I use this kind of project to make a rule visible before adding more machinery around it. The important part here is not the size of the codebase. It is that the input signals, scoring rule, fixture data, and expected output can all be checked in one sitting.
+- `fixtures/domain_review.csv` adds cases for spread pressure and fill risk.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/cinder-trade-portfolio-walkthrough.md` walks through the case spread.
+- The Zig code includes a review path for `quote width` and `spread pressure`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## Files Worth Reading
+## Design Notes
 
-- `src`: primary implementation
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+The core code exposes a scoring path and the added review layer uses `signal`, `slack`, `drag`, and `confidence`. The domain terms are `spread pressure`, `fill risk`, `portfolio drift`, and `quote width`.
 
-## Design Sketch
+The Zig addition stays small enough to inspect in one sitting.
 
-The interesting part is the boundary between accepted and reviewed scenarios. Extended examples sit near that boundary so future edits can show whether the model became more permissive or more cautious. The Zig version uses compile-time constants and native test blocks for fast local checks.
-
-## Usage
+## Example Run
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Tests
 
-## Fixture Notes
+The check exercises the source code and the review fixture. `recovery` is the high score at 220; `stale` is the low score at 150.
 
-The examples are meant to be readable before they are exhaustive. They cover enough variation to show how latency and risk can pull a decision below the threshold.
+## Known Limits
 
-## Verification
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Limits
-
-This code is local-first. It makes no claim about deployed usage and avoids credentials, hosted state, and environment-specific setup.
-
-## Next Directions
-
-- Add a short report command that prints the score breakdown for a single scenario.
-- Add malformed input fixtures so the failure path is as visible as the happy path.
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add one more trading systems fixture that focuses on a malformed or borderline input.
-
-## Setup
-
-Clone the repository, enter the directory, and run the verifier. No database server, cloud account, or token is required.
+The repository is intentionally scoped to local checks. I would expand it by adding adversarial fixtures before adding features.
